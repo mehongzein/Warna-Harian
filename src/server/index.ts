@@ -3,13 +3,16 @@
 // dan menjalankan server lewat createServer (wajib: di dalamnya context
 // per-request di-inject sehingga `context.username`/`redis` bekerja).
 
-import { createServer, context, getServerPort, redis } from '@devvit/web/server';
+import { createServer, context, getServerPort, redis, reddit } from '@devvit/web/server';
 import { createApp, honoToNode } from './app.js';
 
 const app = createApp({
   getUsername: () => context.username,
   getUserId: () => context.userId,
   redis,
+  createPost: () =>
+    reddit.submitCustomPost({ title: 'Warna Harian 🎨 — Teka-teki Campur Warna Harian' }),
+  getSubredditName: () => context.subredditName,
 });
 
 const server = createServer((req, res) => {

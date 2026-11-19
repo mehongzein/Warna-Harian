@@ -51,6 +51,15 @@ export interface ServerDeps {
   getUserId: () => string | undefined;
   redis: RedisLike;
   /**
+   * Membuat postingan game (custom post) di subreddit tempat aplikasi dipasang.
+   * Hanya tersedia di runtime Devvit — index.ts menyuntikkan implementasi asli
+   * lewat reddit.submitCustomPost. Opsional supaya test lokal tetap jalan
+   * tanpa runtime Devvit.
+   */
+  createPost?: () => Promise<{ id: string }>;
+  /** Nama subreddit tempat aplikasi dipasang (untuk URL navigasi). */
+  getSubredditName?: () => string | undefined;
+  /**
    * "Hari ini" menurut server (UTC, "YYYY-MM-DD"), untuk validasi tanggal.
    * Default: tanggal UTC saat ini. Bisa di-override di test.
    */
@@ -234,6 +243,52 @@ export function createApp(deps: ServerDeps): Hono {
     const leaderboard = await readLeaderboard(date, username);
     const res: ScoreResponse = { accepted: true, streak, rank: rank + 1, leaderboard };
     return c.json(res);
+  });
+
+  // ---------- POST /internal/menu/post-create ----------
+  // Dipanggil Reddit saat moderator memilih menu "Buat postingan Warna Harian"
+  // di subreddit. Membuat satu postingan game (custom post) lalu mengarahkan
+  // moderator ke postingan itu. Tanpa menu ini, tidak ada cara membuat
+  // postingan game dari Reddit — inilah yang selama ini hilang.
+  app.post('/internal/menu/post-create', async (c) => {
+    if (!deps.createPost) {
+      return c.json({ showToast: 'Pembuatan postingan tidak tersedia.' }, 500);
+    }
+    try {
+      const post = await deps.createPost();
+      const sub = deps.getSubredditName?.() ?? '';
+      return c.json(
+        { navigateTo: `https://reddit.com/r/${sub}/comments/${post.id}` },
+        200,
+      );
+    } catch (err) {
+      console.error(
+        `[warna-harian] gagal membuat postingan: ${err instanceof Error ? err.stack : err}`,
+      );
+      return c.json({ showToast: 'Gagal membuat postingan' }, 400);
+    }
+  });
+
+  // ---------- POST /internal/triggers/on-app-install ----------
+  // Dipanggil Reddit saat aplikasi dipasang di sebuah subreddit: otomatis
+  // membuat satu postingan game pertama di subreddit itu.
+  app.post('/internal/triggers/on-app-install', async (c) => {
+    if (!deps.createPost) {
+      return c.json({ status: 'error', message: 'Pembuatan postingan tidak tersedia.' }, 500);
+    }
+    try {
+      const post = await deps.createPost();
+      const sub = deps.getSubredditName?.() ?? '';
+      return c.json(
+        { status: 'success', message: `Post created in subreddit ${sub} with id ${post.id}` },
+        200,
+      );
+    } catch (err) {
+      console.error(
+        `[warna-harian] gagal membuat postingan: ${err instanceof Error ? err.stack : err}`,
+      );
+      return c.json({ status: 'error', message: 'Failed to create post' }, 400);
+    }
   });
 
   return app;
