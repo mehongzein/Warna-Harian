@@ -327,6 +327,17 @@ export async function honoToNode(
     body: body && body.length > 0 ? Uint8Array.from(body) : undefined,
   });
   const response = await app.fetch(request);
-  res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
-  res.end(Buffer.from(await response.arrayBuffer()));
+  const bodyBuffer = Buffer.from(await response.arrayBuffer());
+  const resHeaders: Record<string, string> = {};
+  for (const [name, value] of response.headers.entries()) {
+    resHeaders[name] = value;
+  }
+  // Set Content-Length secara eksplisit dari panjang body yang sebenarnya.
+  // Tanpa ini, respons bisa terkirim dengan header Content-Length "null"
+  // sementara body-nya tidak kosong — runtime Devvit menolaknya dan trigger
+  // onAppInstall gagal ("server responded with Content-Length header "null"
+  // but greater than zero required for nonempty response").
+  resHeaders['content-length'] = String(bodyBuffer.length);
+  res.writeHead(response.status, resHeaders);
+  res.end(bodyBuffer);
 }
