@@ -1,0 +1,1 @@
+{"$schema":"https://developers.reddit.com/schema/config-file.v1.json","name":"warna-harian","post":{"dir":"dist/client","entrypoints":{"default":{"entry":"index.html","inline":true}}},"server":{"dir":"dist/server","entry":"index.cjs"},"version":"0.0.1"}
