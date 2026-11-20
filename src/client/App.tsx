@@ -61,6 +61,7 @@ export default function App() {
   const [offline, setOffline] = useState(false);
   const [drops, setDrops] = useState<number[]>([]);
   const [won, setWon] = useState(false);
+  const [showWinCard, setShowWinCard] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
@@ -151,6 +152,7 @@ export default function App() {
   function resetGame() {
     setDrops([]);
     setWon(false);
+    setShowWinCard(false);
     setStartTime(null);
     setElapsedMs(null);
     setScoreState('idle');
@@ -194,7 +196,10 @@ export default function App() {
 
   // Deteksi menang saat kecocokan mencapai ambang.
   useEffect(() => {
-    if (!won && mix && match >= WIN_THRESHOLD) setWon(true);
+    if (!won && mix && match >= WIN_THRESHOLD) {
+      setWon(true);
+      setShowWinCard(true);
+    }
   }, [match, mix, won]);
 
   const verdict =
@@ -258,13 +263,13 @@ export default function App() {
       <div className="flex gap-3">
         <div className="flex-1 rounded-2xl bg-white p-2.5 text-center shadow-sm">
           <div className="mb-1.5 text-xs text-neutral-500">🎯 Warna target</div>
-          <div className="h-[60px] rounded-[10px] border border-black/10" style={{ background: targetHex }} />
+          <div className="h-[44px] rounded-[10px] border border-black/10" style={{ background: targetHex }} />
           <div className="mt-1.5 font-mono text-[13px]">{targetHex}</div>
         </div>
         <div className="flex-1 rounded-2xl bg-white p-2.5 text-center shadow-sm">
           <div className="mb-1.5 text-xs text-neutral-500">🧪 Campuranmu</div>
           <div
-            className="h-[60px] rounded-[10px] border border-black/10"
+            className="h-[44px] rounded-[10px] border border-black/10"
             style={{ background: mix ? hexOf(mix) : '#ffffff' }}
           />
           <div className="mt-1.5 font-mono text-[13px]">{mix ? hexOf(mix) : '— belum ada tetes —'}</div>
@@ -344,44 +349,56 @@ export default function App() {
         </button>
       </div>
 
-      {/* Kartu menang — langsung setelah tombol, supaya terlihat tanpa scroll jauh */}
-      {won && (
-        <div className="wh-pop mt-3 rounded-2xl border-2 border-[#2e9e5b] bg-[#e8f7ee] p-3.5 text-center">
-          <h2 className="text-[19px] font-bold">🎉 Menang!</h2>
-          <p className="mt-1 text-sm">
-            Kamu menang dalam {drops.length} tetes (par {par}) — kecocokan {match}%. {verdict}
-          </p>
-          {scoreState === 'sending' && <p className="mt-1 text-xs text-neutral-500">Menyimpan skor…</p>}
-          {scoreState === 'saved' && myRank && (
-            <p className="mt-1 text-sm font-semibold">🏆 Peringkat hari ini: #{myRank} · 🔥 Streak: {streak} hari</p>
-          )}
-          {scoreState === 'logged-out' && (
-            <p className="mt-1 text-xs text-neutral-600">
-              Login ke Reddit supaya skormu tersimpan di leaderboard &amp; streak.
+      {/* Kartu menang — OVERLAY (fixed), bukan di alur dokumen: supaya selalu
+          terlihat saat menang dan tidak menambah tinggi halaman (webview Reddit
+          tidak bisa di-scroll, jadi konten inline di bawah lipatan tidak
+          terjangkau). */}
+      {won && showWinCard && (
+        <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+          <div className="wh-pop w-full max-w-[420px] rounded-2xl border-2 border-[#2e9e5b] bg-[#e8f7ee] p-3.5 text-center shadow-xl">
+            <h2 className="text-[19px] font-bold">🎉 Menang!</h2>
+            <p className="mt-1 text-sm">
+              Kamu menang dalam {drops.length} tetes (par {par}) — kecocokan {match}%. {verdict}
             </p>
-          )}
-          {scoreState === 'failed' && (
-            <p className="mt-1 text-xs text-neutral-600">Skor gagal tersimpan — coba lagi besok.</p>
-          )}
-          <div className="mt-2 flex gap-2">
+            {scoreState === 'sending' && <p className="mt-1 text-xs text-neutral-500">Menyimpan skor…</p>}
+            {scoreState === 'saved' && myRank && (
+              <p className="mt-1 text-sm font-semibold">🏆 Peringkat hari ini: #{myRank} · 🔥 Streak: {streak} hari</p>
+            )}
+            {scoreState === 'logged-out' && (
+              <p className="mt-1 text-xs text-neutral-600">
+                Login ke Reddit supaya skormu tersimpan di leaderboard &amp; streak.
+              </p>
+            )}
+            {scoreState === 'failed' && (
+              <p className="mt-1 text-xs text-neutral-600">Skor gagal tersimpan — coba lagi besok.</p>
+            )}
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                onClick={copyScore}
+                className="flex-1 rounded-[10px] bg-[#2e9e5b] py-2.5 text-sm font-semibold text-white"
+              >
+                {copied ? '✓ Disalin!' : '📋 Salin skor'}
+              </button>
+              <button
+                type="button"
+                onClick={shareScore}
+                className="flex-1 rounded-[10px] bg-[#2e9e5b] py-2.5 text-sm font-semibold text-white"
+              >
+                ↗️ Bagikan skor
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-neutral-500">
+              Tempel skormu di komentar biar teman-teman bisa ikut main hari ini!
+            </p>
             <button
               type="button"
-              onClick={copyScore}
-              className="flex-1 rounded-[10px] bg-[#2e9e5b] py-2.5 text-sm font-semibold text-white"
+              onClick={() => setShowWinCard(false)}
+              className="mt-2 w-full py-1.5 text-center text-xs text-neutral-500"
             >
-              {copied ? '✓ Disalin!' : '📋 Salin skor'}
-            </button>
-            <button
-              type="button"
-              onClick={shareScore}
-              className="flex-1 rounded-[10px] bg-[#2e9e5b] py-2.5 text-sm font-semibold text-white"
-            >
-              ↗️ Bagikan skor
+              Tutup — lihat leaderboard
             </button>
           </div>
-          <p className="mt-2 text-xs text-neutral-500">
-            Tempel skormu di komentar biar teman-teman bisa ikut main hari ini!
-          </p>
         </div>
       )}
 

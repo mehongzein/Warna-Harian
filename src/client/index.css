@@ -4,15 +4,12 @@
    Dulu root memakai min-height:100% — itu bikin pengukur tinggi webview membaca
    tinggi layar, bukan tinggi konten, sehingga konten di bawah lipatan (kartu
    menang & leaderboard) terpotong dan tidak bisa di-scroll. Tinggi dokumen
-   sekarang murni mengikuti konten. */
+   sekarang murni mengikuti konten. JANGAN pakai overflow-x:hidden di body —
+   di webview Reddit itu bisa mematikan scroll vertikal. */
 html,
 body {
   height: auto;
   min-height: 0;
-}
-
-body {
-  overflow-x: hidden;
 }
 
 /* Denyut untuk tombol "Coba contoh" — menyorot ketukan pertama yang benar. */
