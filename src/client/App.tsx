@@ -249,30 +249,27 @@ export default function App() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[420px] px-4 pb-8 pt-4" style={{ background: '#f6f1e7' }}>
-      <h1 className="text-center text-[22px] font-bold text-neutral-800">🎨 Warna Harian</h1>
-      <p className="mb-1 text-center text-[13px] text-neutral-500">
-        Teka-teki campur warna harian · {formatTanggalId(date)}
-      </p>
-      <p className="mb-3 text-center text-[13px] font-semibold text-neutral-700">
-        🔥 Streak: {streak} hari
+    <div className="mx-auto w-full max-w-[420px] px-4 pb-4 pt-3" style={{ background: '#f6f1e7' }}>
+      <h1 className="text-center text-[21px] font-bold text-neutral-800">🎨 Warna Harian</h1>
+      <p className="mb-2 text-center text-xs text-neutral-500">
+        {formatTanggalId(date)} · 🔥 Streak: {streak} hari
         {init?.username ? ` · u/${init.username}` : ' · belum login'}
       </p>
 
-      {/* Target vs campuran */}
+      {/* Target vs campuran — swatch pendek (36px) supaya hemat tinggi */}
       <div className="flex gap-3">
-        <div className="flex-1 rounded-2xl bg-white p-2.5 text-center shadow-sm">
-          <div className="mb-1.5 text-xs text-neutral-500">🎯 Warna target</div>
-          <div className="h-[44px] rounded-[10px] border border-black/10" style={{ background: targetHex }} />
-          <div className="mt-1.5 font-mono text-[13px]">{targetHex}</div>
+        <div className="flex-1 rounded-2xl bg-white p-2 text-center shadow-sm">
+          <div className="mb-1 text-xs text-neutral-500">🎯 Warna target</div>
+          <div className="h-[36px] rounded-[10px] border border-black/10" style={{ background: targetHex }} />
+          <div className="mt-1 font-mono text-[13px]">{targetHex}</div>
         </div>
-        <div className="flex-1 rounded-2xl bg-white p-2.5 text-center shadow-sm">
-          <div className="mb-1.5 text-xs text-neutral-500">🧪 Campuranmu</div>
+        <div className="flex-1 rounded-2xl bg-white p-2 text-center shadow-sm">
+          <div className="mb-1 text-xs text-neutral-500">🧪 Campuranmu</div>
           <div
-            className="h-[44px] rounded-[10px] border border-black/10"
+            className="h-[36px] rounded-[10px] border border-black/10"
             style={{ background: mix ? hexOf(mix) : '#ffffff' }}
           />
-          <div className="mt-1.5 font-mono text-[13px]">{mix ? hexOf(mix) : '— belum ada tetes —'}</div>
+          <div className="mt-1 font-mono text-[13px]">{mix ? hexOf(mix) : '— belum ada tetes —'}</div>
         </div>
       </div>
 
@@ -299,14 +296,14 @@ export default function App() {
       </div>
 
       {/* Palet */}
-      <div className="mt-3 grid grid-cols-5 gap-2">
+      <div className="mt-2.5 grid grid-cols-5 gap-2">
         {BASES.map((b, i) => (
           <button
             key={b.name}
             type="button"
             onClick={() => addDrop(i)}
             disabled={won || drops.length >= MAX_DROPS}
-            className={`rounded-xl py-2.5 text-[13px] font-bold shadow-[0_2px_0_rgba(0,0,0,0.18)] active:translate-y-[2px] active:shadow-none disabled:opacity-50 ${
+            className={`rounded-xl py-2 text-[13px] font-bold shadow-[0_2px_0_rgba(0,0,0,0.18)] active:translate-y-[2px] active:shadow-none disabled:opacity-50 ${
               hintPulse === i ? 'wh-hint-pulse' : ''
             }`}
             style={{
@@ -320,19 +317,19 @@ export default function App() {
         ))}
       </div>
 
-      <div className="mt-3 flex gap-2">
+      <div className="mt-2.5 flex gap-2">
         <button
           type="button"
           onClick={undoDrop}
           disabled={won || drops.length === 0}
-          className="flex-1 rounded-[10px] border border-neutral-300 bg-white py-2.5 text-sm disabled:opacity-50"
+          className="flex-1 rounded-[10px] border border-neutral-300 bg-white py-2 text-sm disabled:opacity-50"
         >
           ↩️ Batalkan tetes
         </button>
         <button
           type="button"
           onClick={resetGame}
-          className="flex-1 rounded-[10px] border border-neutral-300 bg-white py-2.5 text-sm"
+          className="flex-1 rounded-[10px] border border-neutral-300 bg-white py-2 text-sm"
         >
           🔄 Ulangi
         </button>
@@ -342,7 +339,7 @@ export default function App() {
             setTutorialStep(0);
             setShowTutorial(true);
           }}
-          className="rounded-[10px] border border-neutral-300 bg-white px-3 py-2.5 text-sm"
+          className="rounded-[10px] border border-neutral-300 bg-white px-3 py-2 text-sm"
           aria-label="Cara main"
         >
           ❓ Cara main
@@ -402,9 +399,9 @@ export default function App() {
         </div>
       )}
 
-      {/* Leaderboard harian — langsung setelah kartu menang */}
-      <div className="mt-3 rounded-2xl bg-white p-3 shadow-sm">
-        <h2 className="mb-2 text-[15px] font-bold">🏆 Leaderboard hari ini</h2>
+      {/* Leaderboard harian — langsung setelah tombol */}
+      <div className="mt-2.5 rounded-2xl bg-white p-2.5 shadow-sm">
+        <h2 className="mb-1 text-sm font-bold">🏆 Leaderboard hari ini</h2>
         {leaderboard.length === 0 ? (
           <p className="text-sm text-neutral-500">
             Belum ada yang menang hari ini — jadilah yang pertama!
@@ -436,16 +433,9 @@ export default function App() {
         )}
       </div>
 
-      {/* Cara main — dilipat (details) supaya tidak makan tempat; tutorial overlay
-          sudah menjelaskan saat pertama main. */}
-      <details className="mt-3 rounded-2xl bg-white p-3 text-sm leading-relaxed shadow-sm">
-        <summary className="cursor-pointer font-bold">Cara main</summary>
-        <p className="mt-1.5">
-          Ketuk warna dasar untuk menambahkan 1 tetes ke campuranmu. Campuran adalah rata-rata
-          semua tetes. Putih bikin lebih terang, Hitam bikin lebih gelap. Cocokkan warna target
-          dengan tetes sesedikit mungkin — <b>par hari ini: {par} tetes</b>. Maksimal {MAX_DROPS} tetes.
-        </p>
-      </details>
+      {/* "Cara main" sudah ada sebagai tombol di atas (membuka overlay tutorial),
+          jadi kartu details di bawah ini dihapus — webview tidak bisa di-scroll,
+          setiap piksel tinggi harus untuk leaderboard. */}
 
       {/* Overlay tutorial */}
       {showTutorial && (
