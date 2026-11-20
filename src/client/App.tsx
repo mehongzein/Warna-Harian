@@ -244,7 +244,7 @@ export default function App() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[420px] px-4 pb-8 pt-4" style={{ background: '#f6f1e7', minHeight: '100%' }}>
+    <div className="mx-auto w-full max-w-[420px] px-4 pb-8 pt-4" style={{ background: '#f6f1e7' }}>
       <h1 className="text-center text-[22px] font-bold text-neutral-800">🎨 Warna Harian</h1>
       <p className="mb-1 text-center text-[13px] text-neutral-500">
         Teka-teki campur warna harian · {formatTanggalId(date)}
@@ -258,13 +258,13 @@ export default function App() {
       <div className="flex gap-3">
         <div className="flex-1 rounded-2xl bg-white p-2.5 text-center shadow-sm">
           <div className="mb-1.5 text-xs text-neutral-500">🎯 Warna target</div>
-          <div className="h-[72px] rounded-[10px] border border-black/10" style={{ background: targetHex }} />
+          <div className="h-[60px] rounded-[10px] border border-black/10" style={{ background: targetHex }} />
           <div className="mt-1.5 font-mono text-[13px]">{targetHex}</div>
         </div>
         <div className="flex-1 rounded-2xl bg-white p-2.5 text-center shadow-sm">
           <div className="mb-1.5 text-xs text-neutral-500">🧪 Campuranmu</div>
           <div
-            className="h-[72px] rounded-[10px] border border-black/10"
+            className="h-[60px] rounded-[10px] border border-black/10"
             style={{ background: mix ? hexOf(mix) : '#ffffff' }}
           />
           <div className="mt-1.5 font-mono text-[13px]">{mix ? hexOf(mix) : '— belum ada tetes —'}</div>
@@ -344,15 +344,7 @@ export default function App() {
         </button>
       </div>
 
-      <div className="mt-3 rounded-2xl bg-white p-3 text-sm leading-relaxed shadow-sm">
-        <b>Cara main</b>
-        <br />
-        Ketuk warna dasar untuk menambahkan 1 tetes ke campuranmu. Campuran adalah rata-rata
-        semua tetes. Putih bikin lebih terang, Hitam bikin lebih gelap. Cocokkan warna target
-        dengan tetes sesedikit mungkin — <b>par hari ini: {par} tetes</b>. Maksimal {MAX_DROPS} tetes.
-      </div>
-
-      {/* Kartu menang */}
+      {/* Kartu menang — langsung setelah tombol, supaya terlihat tanpa scroll jauh */}
       {won && (
         <div className="wh-pop mt-3 rounded-2xl border-2 border-[#2e9e5b] bg-[#e8f7ee] p-3.5 text-center">
           <h2 className="text-[19px] font-bold">🎉 Menang!</h2>
@@ -393,7 +385,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Leaderboard harian */}
+      {/* Leaderboard harian — langsung setelah kartu menang */}
       <div className="mt-3 rounded-2xl bg-white p-3 shadow-sm">
         <h2 className="mb-2 text-[15px] font-bold">🏆 Leaderboard hari ini</h2>
         {leaderboard.length === 0 ? (
@@ -426,6 +418,17 @@ export default function App() {
           </p>
         )}
       </div>
+
+      {/* Cara main — dilipat (details) supaya tidak makan tempat; tutorial overlay
+          sudah menjelaskan saat pertama main. */}
+      <details className="mt-3 rounded-2xl bg-white p-3 text-sm leading-relaxed shadow-sm">
+        <summary className="cursor-pointer font-bold">Cara main</summary>
+        <p className="mt-1.5">
+          Ketuk warna dasar untuk menambahkan 1 tetes ke campuranmu. Campuran adalah rata-rata
+          semua tetes. Putih bikin lebih terang, Hitam bikin lebih gelap. Cocokkan warna target
+          dengan tetes sesedikit mungkin — <b>par hari ini: {par} tetes</b>. Maksimal {MAX_DROPS} tetes.
+        </p>
+      </details>
 
       {/* Overlay tutorial */}
       {showTutorial && (

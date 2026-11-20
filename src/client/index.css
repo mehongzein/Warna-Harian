@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Alur dokumen natural untuk webview Reddit: jangan kunci tinggi ke viewport.
+   Dulu root memakai min-height:100% — itu bikin pengukur tinggi webview membaca
+   tinggi layar, bukan tinggi konten, sehingga konten di bawah lipatan (kartu
+   menang & leaderboard) terpotong dan tidak bisa di-scroll. Tinggi dokumen
+   sekarang murni mengikuti konten. */
+html,
+body {
+  height: auto;
+  min-height: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
 /* Denyut untuk tombol "Coba contoh" — menyorot ketukan pertama yang benar. */
 @keyframes wh-pulse-ring {
   0%, 100% { box-shadow: 0 0 0 0 rgba(46, 158, 91, 0.55); }
